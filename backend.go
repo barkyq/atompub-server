@@ -85,7 +85,7 @@ func (b *Backend) PostToRoot(r *http.Request, new_feed *Feed) (feed *Feed, feed_
 		uuid_string = u.String()
 	}
 
-	feed_URL = "/feed/" + uuid_string + ".atom"
+	feed_URL = "/feed/" + uuid_string
 	if _, ok := b.sourcemap[feed_URL]; ok {
 		err = &HTTPError{code: http.StatusConflict, message: "feed with given URI already exists"}
 		return
@@ -341,7 +341,7 @@ jump:
 		return
 	}
 
-	entry_relative := "/entry/" + uuid_string + ".atom"
+	entry_relative := "/entry/" + uuid_string
 	b.entrymap[entry_relative] = entry
 	entry_URL = entry_relative
 

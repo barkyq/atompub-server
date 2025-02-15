@@ -86,7 +86,7 @@ func (s *BillyStorer) Populate(entrymap map[string]*Entry, sourcemap map[string]
 			err = fmt.Errorf("nil pointer dereference")
 		} else if u, e := uuid.Parse(source.Id.Target); e != nil {
 			err = fmt.Errorf("cannot parse source id as urn:uuid")
-		} else if feed_URL := "/feed/" + u.String() + ".atom"; true {
+		} else if feed_URL := "/feed/" + u.String(); true {
 			sourcemap[feed_URL] = source
 		}
 		return
@@ -117,7 +117,7 @@ func (s *BillyStorer) Populate(entrymap map[string]*Entry, sourcemap map[string]
 			err = fmt.Errorf("nil pointer dereference")
 		} else if u, e := uuid.Parse(entry.Source.Id.Target); e != nil {
 			err = fmt.Errorf("cannot parse source id as urn:uuid")
-		} else if feed_URL := "/feed/" + u.String() + ".atom"; false {
+		} else if feed_URL := "/feed/" + u.String(); false {
 			//
 		} else if source, ok := sourcemap[feed_URL]; !ok {
 			err = fmt.Errorf("entry without a source: %s", obj.Name)
@@ -126,7 +126,7 @@ func (s *BillyStorer) Populate(entrymap map[string]*Entry, sourcemap map[string]
 			// will be discarded by the garbage collector
 		} else if u, e := uuid.Parse(entry.Id.Target); e != nil {
 			err = fmt.Errorf("cannot parse entry id as urn:uuid")
-		} else if entry_URL := "/entry/" + u.String() + ".atom"; true {
+		} else if entry_URL := "/entry/" + u.String(); true {
 			entrymap[entry_URL] = entry
 		}
 		return
@@ -142,7 +142,7 @@ func (s *BillyStorer) AddEntry(entry *Entry) (err error) {
 		err = fmt.Errorf("nil pointer dereference")
 	} else if entry_uuid, e := uuid.Parse(entry.Id.Target); e != nil {
 		err = fmt.Errorf("invalid entry id: %w", e)
-	} else if f, e := s.fsys.Create(path.Join("entry", entry_uuid.String()+".atom")); e != nil {
+	} else if f, e := s.fsys.Create(path.Join("entry", entry_uuid.String())); e != nil {
 		err = e
 	} else if s.buf.Reset(); false {
 		//
@@ -190,7 +190,7 @@ func (s *BillyStorer) DeleteEntry(entry *Entry) (err error) {
 	} else if entry_uuid, e := uuid.Parse(entry.Id.Target); e != nil {
 		err = fmt.Errorf("invalid entry id: %w", e)
 	} else {
-		delete(s.hashmap["entry"], entry_uuid.String()+".atom")
+		delete(s.hashmap["entry"], entry_uuid.String())
 	}
 	return
 }
@@ -200,7 +200,7 @@ func (s *BillyStorer) AddSource(source *Source) (err error) {
 		err = fmt.Errorf("nil pointer dereference")
 	} else if source_uuid, e := uuid.Parse(source.Id.Target); e != nil {
 		err = fmt.Errorf("invalid entry id: %w", e)
-	} else if f, e := s.fsys.Create(path.Join("source", source_uuid.String()+".atom")); e != nil {
+	} else if f, e := s.fsys.Create(path.Join("source", source_uuid.String())); e != nil {
 		err = e
 	} else if s.buf.Reset(); false {
 		//
@@ -247,7 +247,7 @@ func (s *BillyStorer) DeleteSource(source *Source) (err error) {
 	} else if source_uuid, e := uuid.Parse(source.Id.Target); e != nil {
 		err = fmt.Errorf("invalid entry id: %w", e)
 	} else {
-		delete(s.hashmap["source"], source_uuid.String()+".atom")
+		delete(s.hashmap["source"], source_uuid.String())
 	}
 	return
 }
