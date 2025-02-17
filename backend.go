@@ -596,7 +596,7 @@ func preparePutContent(innerxml []byte) (prepared []byte, err error) {
 			continue
 		} else {
 			switch tok.Name.Local {
-			case "p", "a":
+			case "p", "a", "div":
 				// allowed
 			default:
 				err = fmt.Errorf("tag %s not allowed", tok.Name.Local)
