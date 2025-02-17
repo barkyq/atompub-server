@@ -348,7 +348,7 @@ jump:
 	return
 }
 
-var protocol_list = [][]byte{[]byte("cat"), []byte("http"), []byte("https"), []byte("mailto"), []byte("tel"), []byte("sms")}
+var protocol_list = []string{"cat", "http", "https", "mailto", "tel", "sms"}
 
 func preparePlainText(input io.Reader) (output []byte, categories []string, err error) {
 	buf := bytes.NewBufferString(`<div xmlns="http://www.w3.org/1999/xhtml" style="white-space: pre-line;"><p>`)
@@ -375,7 +375,7 @@ func preparePlainText(input io.Reader) (output []byte, categories []string, err 
 			input_bytes = nil
 		}
 		for k, v := range protocol_list {
-			if bytes.HasSuffix(before, v) {
+			if bytes.HasSuffix(before, []byte(v)) {
 				raw_url := fmt.Sprintf("%s:%s", v, after)
 				if _, e := url.Parse(raw_url); e == nil {
 					before = before[:len(before)-len(v)]
@@ -421,21 +421,23 @@ func preparePlainText(input io.Reader) (output []byte, categories []string, err 
 		err = e
 		return
 	}
-	for k, u := range urls {
-		var shortened string = u
-		if strings.HasPrefix(u, "https://") {
-			shortened = strings.TrimPrefix(u, "https://")
-		} else if strings.HasPrefix(u, "http://") {
-			shortened = strings.TrimPrefix(u, "http://")
-		} else if strings.HasPrefix(u, "mailto:") {
-			shortened = strings.TrimPrefix(u, "mailto:")
-		} else if strings.HasPrefix(u, "tel:") {
-			shortened = strings.TrimPrefix(u, "tel:")
-		} else if strings.HasPrefix(u, "sms:") {
-			shortened = strings.TrimPrefix(u, "sms:")
+	if len(urls) != 0 {
+		tmp := bytes.NewBuffer(nil)
+		if _, e := fmt.Fprintf(buf, `<div style="word-break:break-all;">`); e != nil {
+			err = e
+			return
 		}
-
-		if _, e := fmt.Fprintf(buf, `<a href="%s">[%d]&#xA0;%s</a>`, u, k+1, shortened); e != nil {
+		for k, u := range urls {
+			if e := xml.EscapeText(tmp, []byte(u)); e != nil {
+				err = e
+				return
+			} else if _, e := fmt.Fprintf(buf, `<a href="%s">[%d]&#xA0;%s</a>`, tmp.String(), k+1, tmp.String()); e != nil {
+				err = e
+				return
+			}
+			tmp.Reset()
+		}
+		if _, e := fmt.Fprintf(buf, `</div>`); e != nil {
 			err = e
 			return
 		}
